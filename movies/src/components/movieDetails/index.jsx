@@ -73,3 +73,4 @@ const MovieDetails = ( props) => {
   );
 };
 export default MovieDetails ;
+
