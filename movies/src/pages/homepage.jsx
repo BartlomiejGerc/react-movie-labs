@@ -1,33 +1,37 @@
-import React, { useState, useEffect } from "react";
-import PageTemplate from '../components/templateMovieListPage'
+import React from "react";
 import { getMovies } from "../api/tmdb-api";
+import PageTemplate from "../components/templateMovieListPage";
+import { useQuery } from "@tanstack/react-query";
+import Spinner from "../components/spinner";
 
+const HomePage = () => {
+  const { data, error, isPending, isError } = useQuery({
+    queryKey: ["discover"],
+    queryFn: getMovies,
+  });
 
-const HomePage = (props) => {
-  const [movies, setMovies] = useState([]);
-  const favorites = movies.filter(m => m.favorite)
-  localStorage.setItem('favorites', JSON.stringify(favorites))
+  if (isPending) {
+    return <Spinner />;
+  }
 
-  const addToFavorites = (movieId) => {
-    const updatedMovies = movies.map((m) =>
-      m.id === movieId ? { ...m, favorite: true } : m
-    );
-    setMovies(updatedMovies);
-  };
+  if (isError) {
+    return <h1>{error.message}</h1>;
+  }
 
-   useEffect(() => {
-    getMovies().then(movies => {
-      setMovies(movies);
-    });
-  }, []);
+  const movies = data.results || [];
 
+  const favorites = movies.filter((m) => m.favorite);
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+
+  const addToFavorites = (movieId) => true;
 
   return (
     <PageTemplate
-      title='Discover Movies'
+      title="Discover Movies"
       movies={movies}
       selectFavorite={addToFavorites}
     />
   );
 };
+
 export default HomePage;
