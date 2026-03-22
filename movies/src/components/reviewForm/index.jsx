@@ -1,32 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { MoviesContext } from "../../contexts/moviesContext";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import { useNavigate } from "react-router";
 import { useForm, Controller } from "react-hook-form";
 
 const ratings = [
-  {
-    value: 5,
-    label: "Excellent",
-  },
-  {
-    value: 4,
-    label: "Good",
-  },
-  {
-    value: 3,
-    label: "Average",
-  },
-  {
-    value: 2,
-    label: "Poor",
-  },
-  {
-    value: 0,
-    label: "Terrible",
-  },
+  { value: 5, label: "Excellent" },
+  { value: 4, label: "Good" },
+  { value: 3, label: "Average" },
+  { value: 2, label: "Poor" },
+  { value: 0, label: "Terrible" },
 ];
 
 const styles = {
@@ -57,30 +46,40 @@ const styles = {
 };
 
 const ReviewForm = ({ movie }) => {
+  const context = useContext(MoviesContext);
+
   const [rating, setRating] = useState(3);
-  
+  const [open, setOpen] = useState(false);   // NEW
+  const navigate = useNavigate();            // NEW
+
   const defaultValues = {
     author: "",
     review: "",
     agree: false,
     rating: "3",
   };
-  
+
   const {
     control,
     formState: { errors },
     handleSubmit,
     reset,
-  } = useForm(defaultValues);
+  } = useForm({ defaultValues });
 
   const handleRatingChange = (event) => {
     setRating(event.target.value);
   };
 
+  const handleSnackClose = (event) => {
+    setOpen(false);
+    navigate("/movies/favorites");
+  };
+
   const onSubmit = (review) => {
     review.movieId = movie.id;
     review.rating = rating;
-    console.log(review);
+    context.addReview(movie, review);
+    setOpen(true); // NEW
   };
 
   return (
@@ -89,12 +88,29 @@ const ReviewForm = ({ movie }) => {
         Write a review
       </Typography>
 
-      <form sx={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+      {/* NEW Snackbar */}
+      <Snackbar
+        sx={styles.snack}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        onClose={handleSnackClose}
+      >
+        <MuiAlert
+          severity="success"
+          variant="filled"
+          onClose={handleSnackClose}
+        >
+          <Typography variant="h4">
+            Thank you for submitting a review
+          </Typography>
+        </MuiAlert>
+      </Snackbar>
+
+      <form style={{ width: "100%" }} onSubmit={handleSubmit(onSubmit)} noValidate>
         <Controller
           name="author"
           control={control}
           rules={{ required: "Name is required" }}
-          defaultValue=""
           render={({ field: { onChange, value } }) => (
             <TextField
               sx={{ width: "40ch" }}
@@ -111,10 +127,9 @@ const ReviewForm = ({ movie }) => {
           )}
         />
         {errors.author && (
-          <Typography variant="h6" component="p">
-            {errors.author.message}
-          </Typography>
+          <Typography variant="h6">{errors.author.message}</Typography>
         )}
+
         <Controller
           name="review"
           control={control}
@@ -122,41 +137,33 @@ const ReviewForm = ({ movie }) => {
             required: "Review cannot be empty.",
             minLength: { value: 10, message: "Review is too short" },
           }}
-          defaultValue=""
           render={({ field: { onChange, value } }) => (
             <TextField
               variant="outlined"
               margin="normal"
               required
               fullWidth
-              name="review"
               value={value}
               onChange={onChange}
               label="Review text"
-              id="review"
               multiline
               minRows={10}
             />
           )}
         />
         {errors.review && (
-          <Typography variant="h6" component="p">
-            {errors.review.message}
-          </Typography>
+          <Typography variant="h6">{errors.review.message}</Typography>
         )}
 
         <Controller
-          control={control}
           name="rating"
-          render={({ field: { onChange, value } }) => (
+          control={control}
+          render={() => (
             <TextField
-              id="select-rating"
               select
-              variant="outlined"
               label="Rating Select"
               value={rating}
               onChange={handleRatingChange}
-              helperText="Don't forget your rating"
             >
               {ratings.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
@@ -167,25 +174,22 @@ const ReviewForm = ({ movie }) => {
           )}
         />
 
-        <Box sx={styles.buttons}>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={styles.submit}
-          >
+        <Box>
+          <Button type="submit" variant="contained" sx={styles.submit}>
             Submit
           </Button>
+
           <Button
             type="reset"
             variant="contained"
             color="secondary"
-            sx={styles.submit}
             onClick={() => {
               reset({
                 author: "",
-                content: "",
+                review: "",
+                rating: "3",
               });
+              setRating(3);
             }}
           >
             Reset
