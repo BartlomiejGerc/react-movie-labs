@@ -5,6 +5,8 @@ import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import Spinner from "../components/spinner";
 import PageTemplate from "../components/templateMovieListPage";
 import { getUpcomingMovies } from "../api/tmdb-api";
+import { useContext } from "react";
+import { MoviesContext } from "../contexts/moviesContext";
 
 const UpcomingMoviesPage = () => {
   const { data, error, isPending, isError } = useQuery({
@@ -12,6 +14,8 @@ const UpcomingMoviesPage = () => {
     queryFn: getUpcomingMovies,
   });
 
+  const { addToMustWatch } = useContext(MoviesContext);
+  
   if (isPending) {
     return <Spinner />;
   }
@@ -23,12 +27,18 @@ const UpcomingMoviesPage = () => {
   const movies = data.results;
 
   const toWatchAction = (movie) => {
-    return (
-      <IconButton aria-label="add to watch list">
-        <PlaylistAddIcon color="primary" fontSize="large" />
-      </IconButton>
-    );
-  };
+  return (
+    <IconButton
+      aria-label="add to must watch"
+      onClick={(e) => {
+        e.preventDefault();
+        addToMustWatch(movie);
+      }}
+    >
+      <PlaylistAddIcon color="primary" fontSize="large" />
+    </IconButton>
+  );
+};
 
   return (
     <PageTemplate
