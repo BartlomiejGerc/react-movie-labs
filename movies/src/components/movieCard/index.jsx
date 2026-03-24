@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { MoviesContext } from "../../contexts/moviesContext";
-
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -18,13 +17,15 @@ import { Link } from "react-router";
 import img from "../../images/film-poster-placeholder.png";
 
 export default function MovieCard({ movie, action }) {
-  const { favorites, addToFavorites } = useContext(MoviesContext);
+const { favorites, addToFavorites, myReviews } = useContext(MoviesContext);
 
   if (favorites.find((id) => id === movie.id)) {
     movie.favorite = true;
   } else {
     movie.favorite = false;
   }
+
+  const hasReview = myReviews[movie.id];
 
   const handleAddToFavorite = (e) => {
     e.preventDefault();
@@ -72,6 +73,11 @@ export default function MovieCard({ movie, action }) {
             </Typography>
           </Grid>
         </Grid>
+         {hasReview && (
+          <Typography variant="body2" sx={{ color: "green", fontWeight: "bold", marginTop: 1 }}>
+            ✔ Reviewed
+          </Typography>
+        )}
       </CardContent>
 
       <CardActions disableSpacing>
