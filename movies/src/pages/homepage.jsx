@@ -6,6 +6,7 @@ import Spinner from "../components/spinner";
 import AddToFavoritesIcon from '../components/cardIcons/addFavorites'
 
 
+
 const HomePage = () => {
   const { data, error, isPending, isError } = useQuery({
     queryKey: ["discover"],

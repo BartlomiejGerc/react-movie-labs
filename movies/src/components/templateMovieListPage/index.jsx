@@ -3,8 +3,9 @@ import Header from "../headerMovieList";
 import FilterCard from "../filterMoviesCard";
 import MovieList from "../movieList";
 import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
 
-function MovieListPageTemplate({ movies, title, action }) {
+  function MovieListPageTemplate({ movies, title, action, page, setPage, totalPages }) {
   const [nameFilter, setNameFilter] = useState("");
   const [genreFilter, setGenreFilter] = useState("0");
   const genreId = Number(genreFilter);
@@ -41,7 +42,29 @@ function MovieListPageTemplate({ movies, title, action }) {
 
         <MovieList movies={displayedMovies} action={action} />
       </Grid>
+      <Grid size={12} sx={{ display: "flex", justifyContent: "center", gap: 2, padding: "20px" }}>
+  <Button
+    variant="contained"
+    disabled={page === 1}
+    onClick={() => setPage(page - 1)}
+  >
+    Previous
+  </Button>
+
+  <Button variant="outlined" disabled>
+    Page {page} of {totalPages}
+  </Button>
+
+  <Button
+    variant="contained"
+    disabled={page === totalPages}
+    onClick={() => setPage(page + 1)}
+  >
+    Next
+  </Button>
+</Grid>
     </Grid>
+    
   );
 }
 
