@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { getMovies } from "../api/tmdb-api";
 import PageTemplate from "../components/templateMovieListPage";
 import { useQuery } from "@tanstack/react-query";
 import Spinner from "../components/spinner";
-import AddToFavoritesIcon from '../components/cardIcons/addFavorites'
-
-
+import AddToFavoritesIcon from "../components/cardIcons/addFavorites";
 
 const HomePage = () => {
+  const [minRating, setMinRating] = useState(0);
+
   const { data, error, isPending, isError } = useQuery({
     queryKey: ["discover"],
     queryFn: getMovies,
@@ -23,21 +23,33 @@ const HomePage = () => {
 
   const movies = data.results || [];
 
+  const filteredMovies = movies.filter(
+    (movie) => movie.vote_average >= minRating
+  );
+
   const favorites = movies.filter((m) => m.favorite);
   localStorage.setItem("favorites", JSON.stringify(favorites));
 
-  const addToFavorites = (movieId) => true;
+  return (
+    <>
+      <select
+        value={minRating}
+        onChange={(e) => setMinRating(Number(e.target.value))}
+      >
+        <option value={0}>All Ratings</option>
+        <option value={5}>5+</option>
+        <option value={6}>6+</option>
+        <option value={7}>7+</option>
+        <option value={8}>8+</option>
+      </select>
 
-    return (
       <PageTemplate
         title="Discover Movies"
-        movies={movies}
-        action={(movie) => {
-          return <AddToFavoritesIcon movie={movie} />
-        }}
+        movies={filteredMovies}
+        action={(movie) => <AddToFavoritesIcon movie={movie} />}
       />
+    </>
   );
-
 };
 
 export default HomePage;
