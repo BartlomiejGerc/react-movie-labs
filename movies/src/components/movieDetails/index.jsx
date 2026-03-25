@@ -57,6 +57,24 @@ const MovieDetails = ({ movie }) => {
         />
         <Chip label={`Released: ${movie.release_date}`} />
       </Paper>
+ <Typography variant="h5" component="h3" sx={{ mt: 3 }}>
+        Cast
+      </Typography>
+
+      {movie.credits && movie.credits.cast && movie.credits.cast.length > 0 ? (
+        <Paper component="ul" sx={{ ...root }}>
+          {movie.credits.cast.slice(0, 10).map((actor) => (
+            <li key={actor.cast_id || actor.credit_id}>
+              <Chip
+                label={`${actor.name} as ${actor.character}`}
+                sx={{ ...chip }}
+              />
+            </li>
+          ))}
+        </Paper>
+      ) : (
+        <Typography variant="body1">No cast information available.</Typography>
+      )}
 
       <Fab
         color="secondary"
