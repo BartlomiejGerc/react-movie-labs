@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
   function MovieListPageTemplate({ movies, title, action, page, setPage, totalPages }) {
   const [nameFilter, setNameFilter] = useState("");
   const [genreFilter, setGenreFilter] = useState("0");
+  
   const genreId = Number(genreFilter);
 
   const displayedMovies = movies
@@ -15,6 +16,8 @@ import Button from "@mui/material/Button";
       m.title.toLowerCase().includes(nameFilter.toLowerCase())
     )
     .filter((m) => (genreId > 0 ? m.genre_ids.includes(genreId) : true));
+    
+
 
   const handleChange = (type, value) => {
     if (type === "name") setNameFilter(value);

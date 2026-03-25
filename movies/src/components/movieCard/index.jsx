@@ -33,7 +33,15 @@ const { favorites, addToFavorites, myReviews } = useContext(MoviesContext);
   };
 
   return (
-    <Card>
+    <Card
+  sx={{
+    transition: "0.3s", 
+    "&:hover": {
+      transform: "scale(1.05)", 
+      boxShadow: 6, 
+    },
+  }}
+>
       <CardHeader
         avatar={
           movie.favorite ? (
